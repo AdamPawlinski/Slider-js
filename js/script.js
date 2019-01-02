@@ -1,5 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const Slider = function(elemSelector) {
+    const Slider = function(elemSelector, opts) {
+        const defaultOpts = {
+            pauseTime: 0,
+            prevText: "Previous slide",
+            nextText: "Next slide",
+            generateDots: true,
+            generatePrevNext: true
+        };
+        this.options = Object.assign({}, defaultOpts, opts);
         this.currentSlide = 0;
         this.sliderSelector = elemSelector; 
         this.elem = null;
@@ -7,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.slides = null;
         this.prev = null;
         this.next = null;
+        this.time = null;
         this.dots = [];
         
         this.generateSlider();    
@@ -29,14 +38,14 @@ document.addEventListener('DOMContentLoaded', function() {
         this.slides = slidesCnt.querySelectorAll('.slider-slide');
         this.slider.appendChild(slidesCnt);
         
-        this.createPrevNext();
-        this.createDots();
+        if (this.options.generatePrevNext) this.createPrevNext();
+        if (this.options.generateDots) this.createDots();
     }
 
     Slider.prototype.createPrevNext = function() {
         this.prev = document.createElement('button');
         this.prev.type = "button";
-        this.innerText = "Previous slide";
+        this.innerText = this.options.prevText;
         this.prev.classList.add('slider-button');
         this.prev.classList.add('slider-button-prev');
         this.prev.addEventListener('click', this.slidePrev.bind(this)); 
@@ -44,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.next = document.createElement('button');
 
         this.next.type = "button";
-        this.innerText = "next slide";
+        this.innerText = this.options.nextText;
         this.next.classList.add('slider-button');
         this.next.classList.add('slider-button-next');
         this.next.addEventListener('click', this.slideNext.bind(this)); 
@@ -94,19 +103,21 @@ document.addEventListener('DOMContentLoaded', function() {
         this.slides[index].classList.add('slider-slide-active');
         this.slides[index].setAttribute('aria-hidden', false);
 
-        // if (this.options.generateDots) {
+        if (this.options.generateDots) {
             this.dots.forEach(function(dot) {
                 dot.classList.remove('slider-dots-element-active');
             });
             this.dots[index].classList.add('slider-dots-element-active');
-        // }
+        }
 
         this.currentSlide = index;
-
-        clearInterval(this.time);
-        this.time = setTimeout(() => {
-            this.slideNext();
-        }, 5000);
+        
+        if (typeof this.options.pauseTime === "number" && this.options.pauseTime !== 0) {
+            clearInterval(this.time);
+            this.time = setTimeout(() => {
+                this.slideNext();
+            }, this.options.pauseTime);
+        }
     }
 
     Slider.prototype.slidePrev = function() {
@@ -126,4 +137,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const slide = new Slider('#slider1');
+    const slide1 = new Slider('#slider2', {
+        pauseTime: 7000,
+        generateDots: true,
+        generatePrevNext: false,
+        prevText: '<<<',
+        nextText: '>>>'
+    });
+    const slide2 = new Slider('#slider3', {
+        pauseTime: 3000,
+        generateDots: false,
+        generatePrevNext: true
+    });
 });
