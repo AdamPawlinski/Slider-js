@@ -2,7 +2,7 @@
 
 .slider {
     position: relative;
-    background: url('//resources/barista1.jpg');
+    background: url('../resources/barista1.jpg');
     background-size: cover;
     background-position: center center;
     margin-bottom: 10%;
